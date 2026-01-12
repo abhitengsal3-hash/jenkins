@@ -1,0 +1,35 @@
+
+
+pipeline{
+    agent any
+    parameters {
+  choice choices: ['devloper', 'production'], name: 'role'
+}
+
+    stages{
+        stage('clone'){
+            steps{
+                git 'https://github.com/abhitengsal3-hash/java11-examples.git'
+            }
+        }
+        stage('package'){
+            steps{
+                sh 'mvn clean package'
+            }
+        }
+        stage('archive'){
+            when {
+  environment name: 'role', value: 'production'
+}
+            steps{
+                archiveArtifacts artifacts: 'target/*.jar', followSymlinks: false
+            }
+        }
+    }
+    post {
+  always {
+    mail bcc: '', body: 'check the build result', cc: '', from: '', replyTo: '', subject: 'build result', to: 'abhitengsal3@gmail.com'
+  }
+}
+
+}
